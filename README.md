@@ -1,52 +1,52 @@
 # 🖥️ PC Control Telegram Bot
 
-Асинхронный Telegram-бот на **Aiogram 3**, предназначенный для удаленного мониторинга и управления компьютером/ноутбуком на базе ОС Windows.
+An asynchronous Telegram bot built with **Aiogram 3**, designed for remote monitoring and control of a Windows-based PC/laptop.
 
-## ✨ Функционал
+## ✨ Features
 
-* **📊 Статус системы:** Просмотр текущей загрузки процессора (ЦП), оперативной памяти (ОЗУ) и состояния батареи.
-* **📋 Буфер обмена:** Быстрое чтение текущего текста из буфера обмена ПК (с автоматическим экранированием и ограничением по длине во избежание ошибок Telegram) + команда `/set` для удаленной отправки текста в буфер обмена.
-* **🎵 Музыкальный пульт:** Удобная Inline-клавиатура для переключения треков, изменения громкости и паузы (имитация мультимедийных клавиш).
-* **⚙️ Тяжелые процессы:** Вывод Топ-5 процессов, потребляющих больше всего ОЗУ, с возможностью полностью завершить (убить) дерево процессов по PID через команду `/kill PID`.
-* **💤 Режим сна & 🛑 Выключение:** Удаленный перевод устройства в спящий режим или полное завершение работы.
-* **🔒 Безопасность:** Бот реагирует на команды исключительно администратора (по указанному `ADMIN_ID`). Запросы от других пользователей полностью игнорируются.
+* **📊 System Status:** View current CPU and RAM usage, as well as battery status.
+* **📋 Clipboard:** Quickly read the current text from the PC's clipboard (with automatic escaping and length limits to prevent Telegram API errors) + the `/set` command to remotely send text to the clipboard.
+* **🎵 Media Controller:** A convenient Inline keyboard to skip tracks, change volume, and play/pause (simulating media keys).
+* **⚙️ Heavy Processes:** Displays the Top 5 processes consuming the most RAM, with the ability to completely terminate (kill) a process tree by its PID using the `/kill PID` command.
+* **💤 Sleep Mode & 🛑 Shutdown:** Remotely put the device to sleep or shut it down completely.
+* **🔒 Security:** The bot responds exclusively to the administrator's commands (specified by `ADMIN_ID`). Requests from other users are completely ignored.
 
 ---
 
-## 🛠️ Требования и установка
+## 🛠️ Requirements & Installation
 
-### 1. Клонирование репозитория
+### 1. Clone the repository
 ```bash
 git clone https://github.com/clowdyyy/pc-control.git
 cd pc-control
 ```
 
-### 2. Установка зависимостей
-Для работы скрипта требуются модули для взаимодействия с системой. Установите их одной командой:
+### 2. Install dependencies
+The script requires specific modules to interact with the system. Install them using a single command:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Настройка окружения
-Переименуйте демонстрационный файл `.env.example` в `.env`:
+### 3. Environment setup
+Rename the demo `.env.example` file to `.env`:
 ```bash
 cp .env.example .env
 ```
-Откройте созданный файл `.env` и заполните конфигурационные данные:
-* `BOT_TOKEN` — токен вашего бота от `@BotFather`.
-* `ADMIN_ID` — ваш числовой Telegram ID (можно узнать через `@userinfobot`).
+Open the created `.env` file and fill in your configuration data:
+* `BOT_TOKEN` — your bot token from `@BotFather`.
+* `ADMIN_ID` — your numeric Telegram ID (can be obtained via `@userinfobot`).
 
 ---
 
-## 🚀 Запуск
+## 🚀 Launch
 
-Запустите скрипт стандартной командой Python:
+Run the script using the standard Python command:
 ```bash
 python main.py
 ```
-После запуска перейдите в Telegram и отправьте боту команду `/start`.
+After launching, go to Telegram and send the `/start` command to the bot.
 
 ---
 
-## ⚠️ Важное примечание
-Файл конфигурации `.env` содержит конфиденциальные данные (токен бота) и автоматически добавлен в `.gitignore`. Никогда не публикуйте его в открытый доступ.
+## ⚠️ Important Note
+The `.env` configuration file contains sensitive data (your bot token) and is automatically added to `.gitignore`. Never publish it in the public domain.
