@@ -11,6 +11,8 @@ import pyautogui
 import pyperclip
 from dotenv import load_dotenv  
 
+pyautogui.FAILSAFE = False
+
 load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
