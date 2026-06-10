@@ -1,7 +1,7 @@
 import os
 import platform
 import asyncio
-import html
+import html as html_module
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.filters import Command, CommandObject
@@ -87,7 +87,7 @@ async def get_clipboard(message: Message):
             if len(text) > 3000:
                 text = text[:3000] + "\n\n⚠️ <i>[Текст обрезан, так как он слишком длинный для Telegram]</i>"
             
-            text = html.escape(text)
+            text = html_module.escape(text)
             response = f"📋 <b>Текст из буфера ноута:</b>\n\n<code>{text}</code>"
         else:
             response = "Буфер обмена пуст или там не текст."
