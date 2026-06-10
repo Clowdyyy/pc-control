@@ -46,6 +46,21 @@ python main.py
 ```
 After launching, go to Telegram and send the `/start` command to the bot.
 
+## ⚙️ Autostart (Background Mode for Windows)
+
+To make the bot run silently in the background every time your PC starts, you can use a VBScript.
+
+1. Press `Win + R`, type `shell:startup`, and press **Enter**.
+2. Create a new file named `run_bot.vbs` in the opened folder.
+3. Paste the following code into the file (replace the path with your actual absolute path to the project directory):
+
+```vbs
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.CurrentDirectory = "C:\Path\To\Your\pc-control"
+WshShell.Run "python main.py", 0, false
+```
+4. Save the file. The bot will now automatically start in the background upon booting Windows.
+
 ---
 
 ## ⚠️ Important Note
