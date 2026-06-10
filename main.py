@@ -10,6 +10,7 @@ import psutil
 import pyautogui
 import pyperclip
 from dotenv import load_dotenv  
+from winsdk.windows.media.control import GlobalSystemMediaTransportControlsSessionManager as MediaManager
 
 pyautogui.FAILSAFE = False
 
@@ -23,6 +24,12 @@ if not TOKEN or not ADMIN_ID:
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+active_media_msg = {
+    "chat_id": None,
+    "message_id": None,
+    "last_track": None
+}
 
 def get_main_keyboard():
     kb = [
@@ -50,17 +57,73 @@ def get_media_inline():
 def is_admin(message: Message) -> bool:
     return message.from_user.id == ADMIN_ID
 
+async def get_current_track_info():
+    """Получает информацию о текущем треке из Windows"""
+    try:
+        manager = await MediaManager.request_async()
+        session = manager.get_current_session()
+        if session:
+            info = await session.try_get_media_properties_async()
+            title = info.title if info.title else "Неизвестный трек"
+            artist = info.artist if info.artist else "Неизвестный автор"
+            return title, artist
+    except Exception:
+        pass
+    return None, None
+
+async def track_monitor():
+    """Фоновая задача, которая проверяет смену трека каждые 2 секунды"""
+    while True:
+        await asyncio.sleep(2) 
+        
+        if not active_media_msg["message_id"]:
+            continue
+            
+        title, artist = await get_current_track_info()
+        
+        if title != active_media_msg["last_track"]:
+            active_media_msg["last_track"] = title
+            
+            if title:
+                new_text = f"🎧 <b>Сейчас играет:</b>\n👤 Автор: <code>{artist}</code>\n💿 Трек: <code>{title}</code>\n\n🎛️ Управление мультимедиа:"
+            else:
+                new_text = "🔇 <b>Ничего не играет</b>\nЗапустите музыку на ПК.\n\n🎛️ Управление мультимедиа:"
+                
+            try:
+                await bot.edit_message_text(
+                    chat_id=active_media_msg["chat_id"],
+                    message_id=active_media_msg["message_id"],
+                    text=new_text,
+                    reply_markup=get_media_inline(),
+                    parse_mode="HTML"
+                )
+            except TelegramBadRequest:
+                pass 
+            except Exception as e:
+                print(f"Ошибка обновления пульта: {e}")
 
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
     if not is_admin(message): return
     await message.answer("🤖 <b>Ассистент ПК запущен.</b> Система готова к удаленному управлению.", reply_markup=get_main_keyboard(), parse_mode="HTML")
 
-
 @dp.message(lambda message: message.text == "🎵 Музыкальный пульт")
 async def show_media_panel(message: Message):
     if not is_admin(message): return
-    await message.answer("🎛️ Управление мультимедиа ноутбука:", reply_markup=get_media_inline())
+    
+    title, artist = await get_current_track_info()
+    
+    if title:
+        text = f"🎧 <b>Сейчас играет:</b>\n👤 Автор: <code>{artist}</code>\n💿 Трек: <code>{title}</code>\n\n🎛️ Управление мультимедиа:"
+        active_media_msg["last_track"] = title
+    else:
+        text = "🔇 <b>Ничего не играет</b>\nЗапустите музыку на ПК.\n\n🎛️ Управление мультимедиа:"
+        active_media_msg["last_track"] = None
+
+    msg = await message.answer(text, reply_markup=get_media_inline(), parse_mode="HTML")
+    
+    active_media_msg["chat_id"] = msg.chat.id
+    active_media_msg["message_id"] = msg.message_id
 
 @dp.callback_query(lambda c: c.data.startswith('media_'))
 async def handle_media_callbacks(callback: CallbackQuery):
@@ -110,7 +173,6 @@ async def set_clipboard(message: Message, command: CommandObject):
     
     pyperclip.copy(command.args)
     await message.answer("✅ Текст успешно скопирован в буфер обмена ноутбука! Можно нажимать Ctrl+V.")
-
 
 @dp.message(lambda message: message.text == "⚙️ Тяжелые процессы")
 async def show_processes(message: Message):
@@ -164,7 +226,6 @@ async def kill_process(message: Message, command: CommandObject):
         
     await message.answer(response, parse_mode="HTML")
 
-
 @dp.message(lambda message: message.text == "📊 Статус системы")
 async def system_status(message: Message):
     if not is_admin(message): return
@@ -196,6 +257,8 @@ async def shutdown_pc(message: Message):
 
 async def main():
     print("Помощник готов к работе...")
+    # Запускаем фоновую задачу отслеживания треков параллельно с ботом
+    asyncio.create_task(track_monitor())
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
