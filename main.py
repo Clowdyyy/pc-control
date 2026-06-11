@@ -257,7 +257,17 @@ async def shutdown_pc(message: Message):
 
 async def main():
     print("Помощник готов к работе...")
-    # Запускаем фоновую задачу отслеживания треков параллельно с ботом
+    
+    if ADMIN_ID:
+        try:
+            await bot.send_message(
+                chat_id=ADMIN_ID,
+                text="🟢 <b>Ноутбук включен!</b>\nСкрипт ассистента запущен и готов к работе.",
+                reply_markup=get_main_keyboard(),
+                parse_mode="HTML"
+            )
+        except Exception as e:
+            print(f"Не удалось отправить уведомление о запуске: {e}")
     asyncio.create_task(track_monitor())
     await dp.start_polling(bot)
 
