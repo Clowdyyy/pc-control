@@ -11,6 +11,13 @@ import pyautogui
 import pyperclip
 from dotenv import load_dotenv  
 from winsdk.windows.media.control import GlobalSystemMediaTransportControlsSessionManager as MediaManager
+import ctypes
+import sys
+
+if sys.platform == "win32":
+    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+    if hwnd:
+        ctypes.windll.user32.ShowWindow(hwnd, 0)
 
 pyautogui.FAILSAFE = False
 
